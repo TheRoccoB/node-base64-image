@@ -1,15 +1,15 @@
-import gulp  from 'gulp';
+import gulp from 'gulp';
 import loadPlugins from 'gulp-load-plugins';
-import del  from 'del';
-import glob  from 'glob';
-import path  from 'path';
+import del from 'del';
+import glob from 'glob';
+import path from 'path';
 import {Instrumenter} from 'isparta';
 import webpack from 'webpack';
 import webpackStream from 'webpack-stream';
-import source  from 'vinyl-source-stream';
+// import source  from 'vinyl-source-stream';
 
 import mochaGlobals from './test/setup/.globals';
-import manifest  from './package.json';
+import manifest from './package.json';
 
 // Load all of our Gulp plugins
 const $ = loadPlugins();
@@ -39,9 +39,6 @@ function lint(files) {
     .pipe($.eslint())
     .pipe($.eslint.format())
     .pipe($.eslint.failOnError())
-    .pipe($.jscs())
-    .pipe($.jscs.reporter())
-    .pipe($.jscs.reporter('fail'))
     .on('error', onError);
 }
 

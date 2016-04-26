@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/riyadhalnur/node-base64-image.svg?branch=master)](https://travis-ci.org/riyadhalnur/node-base64-image)  
+[![Build Status](https://travis-ci.org/riyadhalnur/node-base64-image.svg?branch=master)](https://travis-ci.org/riyadhalnur/node-base64-image) [![Coverage Status](https://coveralls.io/repos/github/riyadhalnur/node-base64-image/badge.svg?branch=master)](https://coveralls.io/github/riyadhalnur/node-base64-image?branch=master)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/riyadhalnur/node-base64-image?branch=master&svg=true)](https://ci.appveyor.com/project/riyadhalnur/node-base64-image?branch=master)  
 
 node-base64-image
 =================
