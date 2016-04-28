@@ -138,5 +138,8 @@
   "env": {
     "browser": true,
     "node": true
-  }
+  },
+  "plugins": [
+    "flow-vars"
+  ]
 }
