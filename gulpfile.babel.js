@@ -1,5 +1,7 @@
 import gulp from 'gulp';
 import loadPlugins from 'gulp-load-plugins';
+import {execFile} from 'child_process';
+import flow from 'flow-bin';
 import del from 'del';
 import glob from 'glob';
 import path from 'path';
@@ -82,10 +84,25 @@ function build() {
 function _mocha() {
   return gulp.src(['test/setup/node.js', 'test/unit/**/*.js'], {read: false})
     .pipe($.mocha({
-      reporter: 'dot',
+      reporter: 'spec',
       globals: Object.keys(mochaGlobals.globals),
       ignoreLeaks: false
     }));
+}
+
+// Thank you @hallettj for this
+function _runFlow(cmd, callback) {
+  execFile(flow, cmd, {
+    cwd: module.__dirname
+  }, function(err, stdout, stderr) {
+    if (err && stdout.length > 0) {
+      return callback(new $.util.PluginError('flow', stdout));
+    } else if (err) {
+      return callback(err);
+    } else {
+      callback();
+    }
+  });
 }
 
 function _registerBabel() {
@@ -109,6 +126,13 @@ function coverage(done) {
     });
 }
 
+function typeCheck(done) {
+  _registerBabel();
+  _runFlow(['start'], function() {
+    _runFlow(['status', '--no-auto-start'], done);
+  });
+}
+
 const watchFiles = ['src/**/*', 'test/**/*', 'package.json', '**/.eslintrc', '.jscsrc'];
 
 // Run the headless unit tests as you make changes.
@@ -124,7 +148,7 @@ function testBrowser() {
   const allFiles = ['./test/setup/browser.js'].concat(testFiles);
 
   // Lets us differentiate between the first build and subsequent builds
-  var firstBuild = true;
+  let firstBuild = true;
 
   // This empty stream might seem like a hack, but we need to specify all of our files through
   // the `entry` option of webpack. Otherwise, it ignores whatever file(s) are placed in here.
@@ -150,10 +174,10 @@ function testBrowser() {
         new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })
       ],
       devtool: 'inline-source-map'
-    }, null, function() {
+    }, null, function () {
       if (firstBuild) {
         $.livereload.listen({port: 35729, host: 'localhost', start: true});
-        var watcher = gulp.watch(watchFiles, ['lint']);
+        // let watcher = gulp.watch(watchFiles, ['lint']);
       } else {
         $.livereload.reload('./tmp/__spec-build.js');
       }
@@ -184,10 +208,13 @@ gulp.task('lint', ['lint-src', 'lint-test', 'lint-gulpfile']);
 gulp.task('build', ['lint', 'clean'], build);
 
 // Lint and run our tests
-gulp.task('test', ['lint'], test);
+gulp.task('test', ['lint', 'flow'], test);
 
 // Set up coverage and run tests
 gulp.task('coverage', ['lint'], coverage);
+
+// Set up type checking using flow
+gulp.task('flow', typeCheck);
 
 // Set up a livereload environment for our spec runner `test/runner.html`
 gulp.task('test-browser', ['lint', 'clean-tmp'], testBrowser);
