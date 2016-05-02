@@ -1,6 +1,7 @@
 {
   "globals": {
     "expect": true,
+    "should": true,
     "mock": true,
     "sandbox": true,
     "spy": true,
