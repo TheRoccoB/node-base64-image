@@ -14,11 +14,11 @@ var base64encoder = function (url, options, callback) {
     throw new Error('URL cannot be empty!');
   }
 
-  var encoder = function (body, options) {
+  var encoder = function (body, options, mimeThing) {
     var image;
 
     if (options && options.string === true) {
-      image = body.toString('base64');
+      image = (mimeThing || '') + body.toString('base64');
       return callback(null, image);
     } else {
       image = new Buffer(body, 'base64');
@@ -37,7 +37,12 @@ var base64encoder = function (url, options, callback) {
       if (err) { return callback(err); }
 
       if (body && res.statusCode === 200) {
-        return encoder(body, options);
+
+        var mimeThing = 'data:' + res.headers['content-type'] + ';base64,';
+        var encoded = encoder(body, options, mimeThing);
+
+        //console.log(encoded)
+        return encoded;
       } else {
         if (!body) { return callback('Image loading error - empty body'); }
         else { return callback('Image loading error - ' + res.statusCode); }
